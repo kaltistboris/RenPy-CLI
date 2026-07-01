@@ -70,6 +70,7 @@ renpy <项目路径> <命令>
 | `compile` | 编译 | 将 .rpy 源代码编译为 .rpyc 字节码 |
 | `distribute` | 构建分发版 | 生成可分发的游戏包（Windows / macOS / Linux 版） |
 | `quit` | 退出游戏 | 发送退出信号到运行中的 Ren'Py 进程 |
+| `screenshot` ⚡ | 截图 | 通过 `scripts/screenshot.py` 捕获游戏窗口画面，用于 AI 视觉分析 |
 
 ### lint 常见输出解读
 
@@ -124,6 +125,30 @@ renpy <project_path> compile
 renpy launcher distribute <project_path>
 ```
 
+### 4. 画面截图（调试/视觉分析）
+
+启动游戏，等待窗口就绪后截取当前画面，用于 AI 视觉分析或文档记录。
+
+```bash
+# 启动并截图（自动退出游戏）
+uv run python scripts/screenshot.py ^
+    --sdk "D:\RenPy\renpy-8.5.3-sdk" ^
+    --project D:\MyProject ^
+    --output screenshot.png
+
+# 附加到已在运行的游戏截图
+uv run python scripts/screenshot.py --attach --output screenshot.png
+```
+
+**脚本功能**：
+- 启动 Ren'Py 项目并等待窗口就绪（超时控制）
+- 自动检测窗口类名 `SDL_app`，过滤离屏/无效窗口
+- 截取游戏客户区画面（PNG 格式）
+- 截图完成后自动发送 `quit` 命令关闭游戏
+- 支持 `--attach` 附加到已在运行的 Ren'Py 游戏
+
+> **依赖**：需要 `pywin32` 和 `Pillow`，项目已通过 `uv add pywin32 Pillow` 配置。
+
 ---
 
 ## VS Code 集成
@@ -144,6 +169,7 @@ python scripts/setup-tasks.py
 | Ren'Py: Lint | `python run_renpy.py <sdk> <project> lint` | — |
 | Ren'Py: Compile | `python run_renpy.py <sdk> <project> compile` | — |
 | Ren'Py: Distribute | `python run_renpy.py <sdk> launcher distribute <project>` | — |
+| Ren'Py: Screenshot | `uv run python scripts/screenshot.py --sdk <sdk> --project <project> --output .vscode/screenshot.png` | — |
 
 > **注**：生成的 tasks 通过 `scripts/run_renpy.py` 封装器调用 Ren'Py CLI。这是因为 `renpy.exe` 是 Windows GUI 程序，直接 shell 调用无法在终端中显示 stdout/stderr 输出。`run_renpy.py` 使用 Python `subprocess` 捕获输出，确保 lint/compile 的结果在 VS Code 终端可见。
 
@@ -212,6 +238,16 @@ renpy <project_path> lint 2>&1 | findstr /i "error"
 
 # 分步检查：先修语法错误，再修警告
 ```
+
+---
+
+## 脚本工具一览
+
+| 脚本 | 用途 |
+|------|------|
+| `scripts/setup-tasks.py` | 生成 VS Code tasks.json |
+| `scripts/run_renpy.py` | Ren'Py CLI 封装器（解决 Windows 输出捕获） |
+| `scripts/screenshot.py` | Ren'Py 游戏窗口截图工具 |
 
 ---
 

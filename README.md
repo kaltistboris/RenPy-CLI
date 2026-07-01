@@ -30,7 +30,17 @@ git clone https://github.com/<你的用户名>/renpy-cli.git ~/.claude/skills/re
 ## 前置要求
 
 1. **Ren'Py SDK**：从 [renpy.org](https://www.renpy.org) 下载并安装
-2. **Python 3.8+**（可选）：用于运行 `scripts/setup-tasks.py`
+2. **Python 3.8+**：用于运行辅助脚本
+3. **uv**（推荐）：Python 包管理器，用于安装依赖
+
+### 安装项目依赖
+
+```bash
+cd renpy-cli
+uv sync
+```
+
+这会安装所有依赖（`pywin32`、`Pillow` 等）。
 
 ---
 
@@ -82,7 +92,8 @@ renpy-cli/
 ├── README.md                       ← 本文件
 ├── scripts/
 │   ├── setup-tasks.py              ← 为项目生成 VS Code tasks.json
-│   └── run_renpy.py                ← Ren'Py CLI 封装器（解决 Windows 输出捕获）
+│   ├── run_renpy.py                ← Ren'Py CLI 封装器（解决 Windows 输出捕获）
+│   └── screenshot.py               ← Ren'Py 游戏窗口截图工具
 ├── templates/
 │   └── renpy-docs.instructions.md  ← 可复用的"文档优先"工作区指令
 ├── .gitignore
