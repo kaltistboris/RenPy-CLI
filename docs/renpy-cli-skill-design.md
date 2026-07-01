@@ -131,12 +131,14 @@ description: >
 ## 五、Phase 1 MVP 范围
 
 - [x] 设计文档（本文）
-- [ ] 创建 SKILL.md
-- [ ] 创建 README.md（安装说明）
-- [ ] 创建 `scripts/setup-tasks.py`
-- [ ] 创建 `templates/renpy-docs.instructions.md`
-- [ ] 发布到 GitHub
-- [ ] 在本机安装测试（WuRongBai 项目）
+- [x] 创建 SKILL.md
+- [x] 创建 README.md（安装说明）
+- [x] 创建 `scripts/setup-tasks.py`
+- [x] 创建 `scripts/run_renpy.py`（Windows 输出捕获封装器）
+- [x] 创建 `scripts/screenshot.py`（游戏窗口截图工具）
+- [x] 创建 `templates/renpy-docs.instructions.md`
+- [x] 发布到 GitHub
+- [x] 在本机安装测试（tutorial 项目）
 
 ---
 
@@ -146,6 +148,21 @@ description: >
 - [ ] pip 包：`pip install renpy-cli`（因为目标用户基本都装 Python）
 - [ ] VS Code 扩展：侧边栏按钮 → 一键 Run / Lint / Build
 - [ ] MCP Server：Agent 通过 MCP 协议直接调用 Ren'Py API
+
+---
+
+## 已实现的扩展
+
+### 游戏窗口截图（MVP 后加入）
+
+通过 `scripts/screenshot.py` 实现：
+
+- 按 `SDL_app` 窗口类名查找 Ren'Py 游戏窗口
+- 支持启动项目截图或附加到已有进程（`--attach`）
+- 使用 `win32gui` API 捕获窗口客户区（1280×720）
+- 超时控制 + 自动退出
+
+**模拟点击的探索**：尝试了 `SendMessage` / `PostMessage` / `SendInput` / `mouse_event` 四种方式向 SDL2 窗口发送鼠标事件，结论是均不可靠。SDL2 的输入处理机制（raw input）使 Windows 消息注入不稳定。目前走纯视觉路线（截图 + AI 分析），交互控制留待未来解决。
 
 ---
 
