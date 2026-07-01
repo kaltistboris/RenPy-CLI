@@ -6,7 +6,7 @@ Ren'Py CLI - VS Code tasks.json 生成器
 
 用法：
     python scripts/setup-tasks.py
-    python scripts/setup-tasks.py --sdk-path "D:\RenPy\renpy-8.5.3-sdk"
+    python scripts/setup-tasks.py --sdk-path "D:\\RenPy\\renpy-8.5.3-sdk"
 """
 
 import json
@@ -102,10 +102,17 @@ def prompt_user_for_sdk() -> Path | None:
 # ── 项目检测 ──────────────────────────────────────────
 
 def find_project_root() -> Path | None:
-    """从当前目录向上查找包含 game/ 的 Ren'Py 项目根目录。"""
+    """从当前目录向上查找包含 game/ 的 Ren'Py 项目根目录。
+
+    排除驱动器根目录（如 D:\\），并要求 game/ 内至少有一个 .rpy 文件。
+    """
     cwd = Path.cwd()
     for parent in [cwd] + list(cwd.parents):
-        if (parent / "game").is_dir():
+        # 跳过驱动器根目录
+        if parent == parent.anchor:
+            continue
+        game_dir = parent / "game"
+        if game_dir.is_dir() and list(game_dir.glob("*.rpy")):
             return parent
     return None
 
@@ -123,7 +130,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
             "type": "shell",
             "command": f'"{sdk_str}" "{proj_str}" run',
             "group": {"kind": "build", "isDefault": True},
-            "presentation": {"echo": true, "reveal": "always", "focus": true},
+            "presentation": {"echo": True, "reveal": "always", "focus": True},
             "problemMatcher": [],
         },
         {
@@ -131,7 +138,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
             "type": "shell",
             "command": f'"{sdk_str}" "{proj_str}" lint',
             "group": "build",
-            "presentation": {"echo": true, "reveal": "always", "focus": false},
+            "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],
         },
         {
@@ -139,7 +146,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
             "type": "shell",
             "command": f'"{sdk_str}" "{proj_str}" compile',
             "group": "build",
-            "presentation": {"echo": true, "reveal": "always", "focus": false},
+            "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],
         },
         {
@@ -147,7 +154,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
             "type": "shell",
             "command": f'"{sdk_str}" launcher distribute "{proj_str}"',
             "group": "build",
-            "presentation": {"echo": true, "reveal": "always", "focus": false},
+            "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],
         },
     ]
