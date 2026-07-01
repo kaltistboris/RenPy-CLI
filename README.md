@@ -81,7 +81,8 @@ renpy-cli/
 ├── SKILL.md                        ← AI Agent 读取的主技能文件
 ├── README.md                       ← 本文件
 ├── scripts/
-│   └── setup-tasks.py              ← 为项目生成 VS Code tasks.json
+│   ├── setup-tasks.py              ← 为项目生成 VS Code tasks.json
+│   └── run_renpy.py                ← Ren'Py CLI 封装器（解决 Windows 输出捕获）
 ├── templates/
 │   └── renpy-docs.instructions.md  ← 可复用的"文档优先"工作区指令
 ├── .gitignore

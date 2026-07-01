@@ -119,8 +119,18 @@ def find_project_root() -> Path | None:
 
 # ── tasks.json 生成 ───────────────────────────────────
 
+def _wrapper_script() -> Path:
+    """返回 run_renpy.py 的路径（与本脚本同目录）。"""
+    return Path(__file__).parent / "run_renpy.py"
+
+
 def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
-    """构建 VS Code tasks 列表。"""
+    """构建 VS Code tasks 列表。
+
+    注：renpy.exe 是 Windows GUI 程序，直接 shell 调用看不到 stdout/stderr，
+    因此 lint/compile/distribute 通过 run_renpy.py 封装以捕获输出。
+    """
+    wrapper = _wrapper_script()
     sdk_str = str(sdk_exe)
     proj_str = str(project_path)
 
@@ -128,7 +138,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
         {
             "label": "Ren'Py: Run",
             "type": "shell",
-            "command": f'"{sdk_str}" "{proj_str}" run',
+            "command": f'python "{wrapper}" "{sdk_str}" "{proj_str}" run',
             "group": {"kind": "build", "isDefault": True},
             "presentation": {"echo": True, "reveal": "always", "focus": True},
             "problemMatcher": [],
@@ -136,7 +146,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
         {
             "label": "Ren'Py: Lint",
             "type": "shell",
-            "command": f'"{sdk_str}" "{proj_str}" lint',
+            "command": f'python "{wrapper}" "{sdk_str}" "{proj_str}" lint',
             "group": "build",
             "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],
@@ -144,7 +154,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
         {
             "label": "Ren'Py: Compile",
             "type": "shell",
-            "command": f'"{sdk_str}" "{proj_str}" compile',
+            "command": f'python "{wrapper}" "{sdk_str}" "{proj_str}" compile',
             "group": "build",
             "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],
@@ -152,7 +162,7 @@ def build_tasks(sdk_exe: Path, project_path: Path) -> list[dict]:
         {
             "label": "Ren'Py: Distribute",
             "type": "shell",
-            "command": f'"{sdk_str}" launcher distribute "{proj_str}"',
+            "command": f'python "{wrapper}" "{sdk_str}" launcher distribute "{proj_str}"',
             "group": "build",
             "presentation": {"echo": True, "reveal": "always", "focus": False},
             "problemMatcher": [],

@@ -140,14 +140,16 @@ python scripts/setup-tasks.py
 
 | 任务名 | 命令 | 快捷键 |
 |--------|------|--------|
-| Ren'Py: Run | `renpy <project> run` | `Ctrl+Shift+B` (build) |
-| Ren'Py: Lint | `renpy <project> lint` | — |
-| Ren'Py: Compile | `renpy <project> compile` | — |
-| Ren'Py: Distribute | `renpy launcher distribute <project>` | — |
+| Ren'Py: Run | `python run_renpy.py <sdk> <project> run` | `Ctrl+Shift+B` (build) |
+| Ren'Py: Lint | `python run_renpy.py <sdk> <project> lint` | — |
+| Ren'Py: Compile | `python run_renpy.py <sdk> <project> compile` | — |
+| Ren'Py: Distribute | `python run_renpy.py <sdk> launcher distribute <project>` | — |
+
+> **注**：生成的 tasks 通过 `scripts/run_renpy.py` 封装器调用 Ren'Py CLI。这是因为 `renpy.exe` 是 Windows GUI 程序，直接 shell 调用无法在终端中显示 stdout/stderr 输出。`run_renpy.py` 使用 Python `subprocess` 捕获输出，确保 lint/compile 的结果在 VS Code 终端可见。
 
 ### 手动配置 tasks.json
 
-如果不想用脚本，也可以手动创建 `.vscode/tasks.json`，参考 `scripts/setup-tasks.py` 的输出格式。
+如果不想用脚本，也可以手动创建 `.vscode/tasks.json`，参考 `scripts/setup-tasks.py` 的输出格式。注意 lint/compile 等需要输出捕获的任务应通过 `run_renpy.py` 封装。
 
 ---
 
@@ -165,6 +167,26 @@ python scripts/setup-tasks.py
 ```bash
 "D:\RenPy\renpy-8.5.3-sdk\renpy.exe" <project_path> lint
 ```
+
+### Windows 下无终端输出
+
+```
+（命令执行成功但终端没有任何输出）
+```
+
+**原因**：`renpy.exe` 是 Windows GUI 子系统程序，从终端（bash/cmd）直接运行时，其 stdout/stderr **不会**连接到当前终端，导致输出不可见。但命令本身仍正常执行（可通过退出码判断）。
+
+**解决**：用 Python 的 `subprocess` 捕获输出：
+```python
+import subprocess
+result = subprocess.run(
+    ["renpy.exe", "project_path", "lint"],
+    capture_output=True, text=True, timeout=30
+)
+print(result.stdout)
+```
+
+或在 PowerShell 中用 `Start-Process` 的 `-Wait` 参数，或直接查看 Ren'Py 生成的日志文件。
 
 ### 路径包含空格
 
