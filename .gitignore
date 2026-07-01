@@ -5,6 +5,9 @@ __pycache__/
 dist/
 build/
 
+# uv init default entry (not used in this project)
+main.py
+
 # VS Code
 .vscode/settings.json
 .vscode/*.code-snippets
@@ -12,6 +15,9 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test artifacts
+tutorial_screenshot.png
 
 # Editor
 *.swp
